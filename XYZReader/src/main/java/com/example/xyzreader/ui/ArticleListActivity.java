@@ -1,6 +1,6 @@
 package com.example.xyzreader.ui;
 
-import android.app.ActivityOptions;
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,6 +10,8 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +23,6 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
-import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.data.UpdaterService;
 import com.example.xyzreader.utility.Utils;
 
@@ -86,13 +87,13 @@ public class ArticleListActivity extends AppCompatActivity
   }
 
   @Override public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-    Adapter adapter = new Adapter(cursor);
+    Adapter adapter = new Adapter(cursor, this);
     adapter.setHasStableIds(true);
-    mRecyclerView.setAdapter(adapter);
     int columnCount = getResources().getInteger(R.integer.list_column_count);
-    StaggeredGridLayoutManager sglm =
-        new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
-    mRecyclerView.setLayoutManager(sglm);
+    adapter.setHasStableIds(true);
+    mRecyclerView.setLayoutManager(
+        new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL));
+    mRecyclerView.setAdapter(adapter);
   }
 
   @Override public void onLoaderReset(Loader<Cursor> loader) {
@@ -100,10 +101,12 @@ public class ArticleListActivity extends AppCompatActivity
   }
 
   private class Adapter extends RecyclerView.Adapter<ViewHolder> {
+    private final Activity mActivity;
     private Cursor mCursor;
 
-    public Adapter(Cursor cursor) {
+    public Adapter(Cursor cursor, Activity activity) {
       mCursor = cursor;
+      mActivity = activity;
     }
 
     @Override public long getItemId(int position) {
@@ -114,16 +117,20 @@ public class ArticleListActivity extends AppCompatActivity
     @Override public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
       View view = getLayoutInflater().inflate(R.layout.list_item_article, parent, false);
       final ViewHolder vh = new ViewHolder(view);
+
       view.setOnClickListener(new View.OnClickListener() {
         @Override public void onClick(View view) {
+          Intent intent = new Intent(getApplicationContext(), ArticleDetailActivity.class);
+          intent.putExtra("itemid", getItemId(vh.getAdapterPosition()));
+          intent.putExtra("cursorpos", mCursor.getPosition());
           Bundle bundle = null;
-          if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            vh.thumbnailView.setTransitionName(getString(R.string.transition_image));
-             bundle = ActivityOptions.makeSceneTransitionAnimation(ArticleListActivity.this,
-                vh.thumbnailView, vh.thumbnailView.getTransitionName()).toBundle();
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(mActivity);
+            ActivityCompat.startActivity(mActivity, intent, options.toBundle());
+          } else {
+            startActivity(intent);
           }
-          startActivity(new Intent(Intent.ACTION_VIEW,
-              ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))),bundle);
         }
       });
       return vh;
@@ -158,7 +165,6 @@ public class ArticleListActivity extends AppCompatActivity
           .start();
     }
   }
-
 
   public static class ViewHolder extends RecyclerView.ViewHolder {
     public DynamicHeightNetworkImageView thumbnailView;

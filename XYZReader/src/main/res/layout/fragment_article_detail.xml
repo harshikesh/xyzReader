@@ -27,7 +27,6 @@
             android:layout_height="@dimen/detail_photo_height"
             android:scaleType="fitXY"
             android:adjustViewBounds="true"
-            android:transitionName="@string/transition_image"
             tools:background="@drawable/logo"
         />
         <View
@@ -37,6 +36,7 @@
       </FrameLayout>
 
       <com.example.xyzreader.ui.MaxWidthLinearLayout
+          android:id="@+id/detailbody"
           android:orientation="vertical"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
@@ -62,6 +62,7 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:paddingBottom="@dimen/detail_metabar_title_bottom_padding"
+              android:transitionName="@string/transition_title"
               tools:text="The title is "
           />
 
@@ -70,6 +71,7 @@
               style="@style/subheader.title.theme"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              tools:text="sda"
 
           />
         </LinearLayout>

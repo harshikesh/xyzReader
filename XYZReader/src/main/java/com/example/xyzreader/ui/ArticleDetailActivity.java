@@ -29,6 +29,8 @@ public class ArticleDetailActivity extends AppCompatActivity
   private Cursor mCursor;
   private long mStartId;
 
+  private int mStartCursorPos;
+
   private long mSelectedItemId;
   private int mSelectedItemUpButtonFloor = Integer.MAX_VALUE;
   private int mTopInset;
@@ -61,7 +63,7 @@ public class ArticleDetailActivity extends AppCompatActivity
     mUpButton = findViewById(R.id.action_up);
     mUpButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View view) {
-        onBackPressed();
+        onSupportNavigateUp();
       }
     });
 
@@ -78,8 +80,9 @@ public class ArticleDetailActivity extends AppCompatActivity
     }
 
     if (savedInstanceState == null) {
-      if (getIntent() != null && getIntent().getData() != null) {
-        mStartId = ItemsContract.Items.getItemId(getIntent().getData());
+      if (getIntent() != null) {
+        mStartId = getIntent().getLongExtra("itemid", 0);
+        mStartCursorPos = getIntent().getIntExtra("cursorpos", 0);
         mSelectedItemId = mStartId;
       }
     }
@@ -93,6 +96,7 @@ public class ArticleDetailActivity extends AppCompatActivity
               .alpha((state == ViewPager.SCROLL_STATE_IDLE) ? 1f : 0f)
               .setDuration(DEFAULT_ANIM_TIME);
         }
+
         @Override public void onPageSelected(int position) {
           if (mCursor != null) {
             mCursor.moveToPosition(position);
@@ -112,15 +116,7 @@ public class ArticleDetailActivity extends AppCompatActivity
     // Select the start ID
     if (mStartId > 0) {
       mCursor.moveToFirst();
-      // TODO: optimize
-      while (!mCursor.isAfterLast()) {
-        if (mCursor.getLong(ArticleLoader.Query._ID) == mStartId) {
-          final int position = mCursor.getPosition();
-          mPager.setCurrentItem(position, false);
-          break;
-        }
-        mCursor.moveToNext();
-      }
+      mPager.setCurrentItem(mStartCursorPos, false);
       mStartId = 0;
     }
   }
