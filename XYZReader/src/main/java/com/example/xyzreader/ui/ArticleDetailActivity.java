@@ -26,6 +26,9 @@ public class ArticleDetailActivity extends AppCompatActivity
     implements LoaderManager.LoaderCallbacks<Cursor> {
 
   private static final long DEFAULT_ANIM_TIME = 300;
+
+  public static final String ITEM_ID = "itemid";
+  public static final String CURSOR_POSITION = "cursorPosition";
   private Cursor mCursor;
   private long mStartId;
 
@@ -81,8 +84,8 @@ public class ArticleDetailActivity extends AppCompatActivity
 
     if (savedInstanceState == null) {
       if (getIntent() != null) {
-        mStartId = getIntent().getLongExtra("itemid", 0);
-        mStartCursorPos = getIntent().getIntExtra("cursorpos", 0);
+        mStartId = getIntent().getLongExtra(ITEM_ID, 0);
+        mStartCursorPos = getIntent().getIntExtra(CURSOR_POSITION, 0);
         mSelectedItemId = mStartId;
       }
     }

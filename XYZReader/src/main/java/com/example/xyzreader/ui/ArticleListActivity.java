@@ -121,8 +121,8 @@ public class ArticleListActivity extends AppCompatActivity
       view.setOnClickListener(new View.OnClickListener() {
         @Override public void onClick(View view) {
           Intent intent = new Intent(getApplicationContext(), ArticleDetailActivity.class);
-          intent.putExtra("itemid", getItemId(vh.getAdapterPosition()));
-          intent.putExtra("cursorpos", mCursor.getPosition());
+          intent.putExtra(ArticleDetailActivity.ITEM_ID, getItemId(vh.getAdapterPosition()));
+          intent.putExtra(ArticleDetailActivity.CURSOR_POSITION, mCursor.getPosition());
           Bundle bundle = null;
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ActivityOptionsCompat options = ActivityOptionsCompat.
